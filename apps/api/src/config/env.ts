@@ -9,7 +9,7 @@ const EnvSchema = z.object({
   API_BASE_URL: z.string().default('http://localhost:5000'),
   CLIENT_ORIGIN: z.string().default('http://localhost:3000'),
   EXTENSION_ID: z.string().default('chrome-extension://abcdefghijklmnopqrstuvwxyz123456'),
-  MONGODB_URI: z.string().default('mongodb://localhost:27017/openproofpay'),
+  MONGODB_URI: z.string().default(process.env.MONGO_URL || 'mongodb://localhost:27017/openproofpay'),
   JWT_ACCESS_SECRET: z.string().min(32, 'JWT_ACCESS_SECRET must be at least 32 characters').default('development_jwt_access_secret_key_minimum_32_characters_long_for_security'),
   JWT_REFRESH_SECRET: z.string().min(32, 'JWT_REFRESH_SECRET must be at least 32 characters').default('development_jwt_refresh_secret_key_minimum_32_characters_long_for_security'),
   JWT_ACCESS_EXPIRATION: z.string().default('15m'),
