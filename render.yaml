@@ -83,7 +83,6 @@ services:
   - type: web
     name: openproofpay-web
     runtime: static
-    plan: free
     branch: main
     rootDir: .
     buildCommand: npm ci && npm run build --workspace=@openproofpay/shared && npm run build --workspace=@openproofpay/web
