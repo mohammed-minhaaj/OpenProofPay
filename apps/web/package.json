@@ -1,0 +1,28 @@
+{
+  "name": "@openproofpay/web",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Web Dashboard for OpenProofPay",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@openproofpay/shared": "*",
+    "ag-charts-community": "^14.3.0",
+    "ag-charts-react": "^14.3.0",
+    "ag-grid-community": "^36.3.0",
+    "ag-grid-react": "^36.3.0",
+    "lucide-react": "^0.436.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "typescript": "^5.5.4"
+  }
+}

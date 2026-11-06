@@ -1,0 +1,34 @@
+{
+  "name": "openproofpay-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "OpenProofPay - AI-powered work verification and milestone-based PayPal payments (Proof-to-Pay)",
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "dev": "node scripts/dev.js",
+    "dev:api": "npm --workspace=@openproofpay/api run dev",
+    "dev:web": "npm --workspace=@openproofpay/web run dev",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "package:extension": "node scripts/package-extension.js",
+    "db:reset": "node scripts/db-reset.js",
+    "clean": "npm run clean --workspaces --if-present"
+  },
+  "keywords": [
+    "proof-to-pay",
+    "paypal",
+    "github",
+    "ai-verification",
+    "chrome-extension"
+  ],
+  "author": "OpenProofPay Engineering Team",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.5.4"
+  }
+}

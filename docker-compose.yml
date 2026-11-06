@@ -1,0 +1,69 @@
+version: '3.8'
+
+services:
+  # ----------------------------------------------------------------------------
+  # 1. MongoDB Database
+  # ----------------------------------------------------------------------------
+  mongo:
+    image: mongo:7.0
+    container_name: openproofpay-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: openproofpay
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ----------------------------------------------------------------------------
+  # 2. Backend API Service
+  # ----------------------------------------------------------------------------
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: openproofpay-api
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      MONGODB_URI: mongodb://mongo:27017/openproofpay
+      CLIENT_ORIGIN: http://localhost:3000
+      EXTENSION_ID: chrome-extension://abcdefghijklmnopqrstuvwxyz123456
+      JWT_ACCESS_SECRET: development_jwt_access_secret_key_minimum_32_characters_long_for_security
+      JWT_REFRESH_SECRET: development_jwt_refresh_secret_key_minimum_32_characters_long_for_security
+      AI_PROVIDER: ${AI_PROVIDER:-gemini}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      PAYPAL_MODE: sandbox
+      PAYPAL_BASE_URL: https://api-m.sandbox.paypal.com
+      PAYPAL_CLIENT_ID: ${PAYPAL_CLIENT_ID}
+      PAYPAL_CLIENT_SECRET: ${PAYPAL_CLIENT_SECRET}
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+  # ----------------------------------------------------------------------------
+  # 3. Web Dashboard (Nginx SPA)
+  # ----------------------------------------------------------------------------
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      args:
+        VITE_API_URL: http://localhost:5000/api/v1
+    container_name: openproofpay-web
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      - api
+
+volumes:
+  mongo-data:

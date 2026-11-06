@@ -1,0 +1,135 @@
+# ==============================================================================
+# OPENPROOFPAY — RENDER INFRASTRUCTURE BLUEPRINT (render.yaml)
+# ==============================================================================
+# Full-stack deployment blueprint for OpenProofPay on Render:
+# 1. API Web Service (Node.js Express + MongoDB Atlas)
+# 2. Asynchronous Background Worker (AI Verification & Test Queue)
+# 3. Web Dashboard (Static Site SPA with HTML5 pushState rewrite rules)
+
+services:
+  # ----------------------------------------------------------------------------
+  # 1. Backend API Web Service
+  # ----------------------------------------------------------------------------
+  - type: web
+    name: openproofpay-api
+    runtime: node
+    plan: starter
+    region: oregon
+    branch: main
+    rootDir: .
+    buildCommand: npm ci && npm run build --workspace=@openproofpay/shared && npm run build --workspace=@openproofpay/api
+    startCommand: npm run start --workspace=@openproofpay/api
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+      - key: MONGODB_URI
+        sync: false # Set in Render Dashboard (MongoDB Atlas cluster connection string)
+      - key: CLIENT_ORIGIN
+        sync: false # e.g. https://openproofpay.onrender.com
+      - key: EXTENSION_ID
+        sync: false # e.g. chrome-extension://your-published-extension-id
+      - key: JWT_ACCESS_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: JWT_ACCESS_EXPIRATION
+        value: 15m
+      - key: JWT_REFRESH_EXPIRATION
+        value: 7d
+      # GitHub Integration
+      - key: GITHUB_APP_ID
+        sync: false
+      - key: GITHUB_APP_PRIVATE_KEY_BASE64
+        sync: false
+      - key: GITHUB_CLIENT_ID
+        sync: false
+      - key: GITHUB_CLIENT_SECRET
+        sync: false
+      - key: GITHUB_WEBHOOK_SECRET
+        sync: false
+      # AI Verification
+      - key: AI_PROVIDER
+        value: gemini
+      - key: GEMINI_API_KEY
+        sync: false # Set in Render Dashboard
+      - key: AI_MODEL_NAME
+        value: gemini-2.5-pro
+      - key: AI_TEMPERATURE
+        value: "0.2"
+      # PayPal Sandbox
+      - key: PAYPAL_MODE
+        value: sandbox
+      - key: PAYPAL_ENVIRONMENT
+        value: sandbox
+      - key: PAYPAL_BASE_URL
+        value: https://api-m.sandbox.paypal.com
+      - key: PAYPAL_CLIENT_ID
+        sync: false # Set in Render Dashboard
+      - key: PAYPAL_CLIENT_SECRET
+        sync: false # Set in Render Dashboard
+      - key: PAYPAL_WEBHOOK_ID
+        sync: false
+      - key: PAYPAL_PAYOUTS_ENABLED
+        value: "false"
+      - key: PAYPAL_BN_CODE
+        value: OpenProofPay_ProofToPay
+
+  # ----------------------------------------------------------------------------
+  # 2. Asynchronous Background Worker (AI Verification & Test Queue)
+  # ----------------------------------------------------------------------------
+  - type: worker
+    name: openproofpay-worker
+    runtime: node
+    plan: starter
+    region: oregon
+    branch: main
+    rootDir: .
+    buildCommand: npm ci && npm run build --workspace=@openproofpay/shared && npm run build --workspace=@openproofpay/api
+    startCommand: node apps/api/dist/server.js
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        fromService:
+          type: web
+          name: openproofpay-api
+          envVarKey: MONGODB_URI
+      - key: GEMINI_API_KEY
+        fromService:
+          type: web
+          name: openproofpay-api
+          envVarKey: GEMINI_API_KEY
+      - key: PAYPAL_CLIENT_ID
+        fromService:
+          type: web
+          name: openproofpay-api
+          envVarKey: PAYPAL_CLIENT_ID
+      - key: PAYPAL_CLIENT_SECRET
+        fromService:
+          type: web
+          name: openproofpay-api
+          envVarKey: PAYPAL_CLIENT_SECRET
+
+  # ----------------------------------------------------------------------------
+  # 3. Web Dashboard Static Site SPA
+  # ----------------------------------------------------------------------------
+  - type: static
+    name: openproofpay-web
+    branch: main
+    rootDir: .
+    buildCommand: npm ci && npm run build --workspace=@openproofpay/shared && npm run build --workspace=@openproofpay/web
+    staticPublishPath: apps/web/dist
+    autoDeploy: true
+    envVars:
+      - key: VITE_API_URL
+        sync: false # e.g. https://openproofpay-api.onrender.com/api/v1
+    routes:
+      # HTML5 pushState rewrite: route all SPA paths to index.html
+      - type: rewrite
+        source: /*
+        destination: /index.html

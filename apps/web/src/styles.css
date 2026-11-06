@@ -1,0 +1,285 @@
+:root {
+  /* ============================================================== */
+  /* MIDNIGHT × ICE BLUE DESIGN SYSTEM — DARK MODE (DEFAULT)        */
+  /* ============================================================== */
+  --bg-primary: #0C1018;
+  --bg-sidebar: #101722;
+  --bg-secondary: #101722;
+  --card-bg: #151C27;
+  --bg-card: #151C27;
+  --bg-elevated: #222D3B;
+
+  /* Accent Colors */
+  --primary-accent: #9CCBEB;
+  --primary-hover: #B1D8F2;
+  --secondary-accent: #78B7DC;
+  --accent-blue: #9CCBEB;
+  --accent-hover: #B1D8F2;
+
+  /* Typography Colors */
+  --text-primary: #EAF3FA;
+  --text-secondary: #A5B7C7;
+  --text-muted: #788B9D;
+
+  /* Surface Borders */
+  --border-color: #293746;
+  --card-border: #293746;
+  --input-bg: #101722;
+  --input-border: #293746;
+
+  /* Button Theming (High contrast on Ice Blue: dark text on light accent) */
+  --btn-primary-bg: #9CCBEB;
+  --btn-primary-text: #0C1018;
+  --btn-primary-hover: #B1D8F2;
+  --btn-secondary-bg: #151C27;
+  --btn-secondary-text: #EAF3FA;
+  --btn-secondary-hover: #222D3B;
+
+  /* Status Colors */
+  --status-success: #22C58B;
+  --status-error: #EF6464;
+  --status-warning: #E9AE55;
+  --status-info: #64AEE0;
+
+  --accent-green: #22C58B;
+  --accent-red: #EF6464;
+  --accent-amber: #E9AE55;
+  --accent-purple: #78B7DC;
+
+  /* Subtle Badge Surface & Border Colors */
+  --status-success-bg: rgba(34, 197, 139, 0.14);
+  --status-success-border: rgba(34, 197, 139, 0.32);
+  --status-error-bg: rgba(239, 100, 100, 0.14);
+  --status-error-border: rgba(239, 100, 100, 0.32);
+  --status-warning-bg: rgba(233, 174, 85, 0.14);
+  --status-warning-border: rgba(233, 174, 85, 0.32);
+  --status-info-bg: rgba(100, 174, 224, 0.14);
+  --status-info-border: rgba(100, 174, 224, 0.32);
+
+  /* Shadows (Fintech subtle, no harsh glows) */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.55);
+
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+[data-theme="light"] {
+  /* ============================================================== */
+  /* MIDNIGHT × ICE BLUE DESIGN SYSTEM — LIGHT MODE                 */
+  /* ============================================================== */
+  --bg-primary: #F4F8FB;
+  --bg-sidebar: #EDF3F7;
+  --bg-secondary: #EDF3F7;
+  --card-bg: #FFFFFF;
+  --bg-card: #FFFFFF;
+  --bg-elevated: #EAF2F8;
+
+  /* Accent Colors */
+  --primary-accent: #527F9F;
+  --primary-hover: #416B89;
+  --secondary-accent: #6E9FBE;
+  --accent-blue: #527F9F;
+  --accent-hover: #416B89;
+
+  /* Typography Colors */
+  --text-primary: #172633;
+  --text-secondary: #536B7C;
+  --text-muted: #8294A2;
+
+  /* Surface Borders */
+  --border-color: #DFE8EF;
+  --card-border: #DFE8EF;
+  --input-bg: #FFFFFF;
+  --input-border: #DFE8EF;
+
+  /* Button Theming (Slate Blue with crisp white text) */
+  --btn-primary-bg: #527F9F;
+  --btn-primary-text: #FFFFFF;
+  --btn-primary-hover: #416B89;
+  --btn-secondary-bg: #FFFFFF;
+  --btn-secondary-text: #172633;
+  --btn-secondary-hover: #EAF2F8;
+
+  /* Status Colors */
+  --status-success: #22C58B;
+  --status-error: #EF6464;
+  --status-warning: #E9AE55;
+  --status-info: #64AEE0;
+
+  --accent-green: #22C58B;
+  --accent-red: #EF6464;
+  --accent-amber: #E9AE55;
+  --accent-purple: #6E9FBE;
+
+  /* Subtle Badge Surface & Border Colors */
+  --status-success-bg: rgba(34, 197, 139, 0.12);
+  --status-success-border: rgba(34, 197, 139, 0.35);
+  --status-error-bg: rgba(239, 100, 100, 0.12);
+  --status-error-border: rgba(239, 100, 100, 0.35);
+  --status-warning-bg: rgba(233, 174, 85, 0.14);
+  --status-warning-border: rgba(233, 174, 85, 0.38);
+  --status-info-bg: rgba(100, 174, 224, 0.12);
+  --status-info-border: rgba(100, 174, 224, 0.35);
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(23, 38, 51, 0.06);
+  --shadow-md: 0 4px 16px rgba(23, 38, 51, 0.08);
+  --shadow-lg: 0 12px 32px rgba(23, 38, 51, 0.12);
+}
+
+/* Base Reset & Typography */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-family);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+button, input, select, textarea {
+  font-family: inherit;
+  color: inherit;
+}
+
+a {
+  color: var(--primary-accent);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+a:hover {
+  color: var(--primary-hover);
+  text-decoration: underline;
+}
+
+/* Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* Code Blocks & Diff Stying */
+pre, code {
+  font-family: var(--font-mono);
+}
+
+/* Custom AG Grid Theming (Seamless Midnight × Ice Blue in both Dark and Light) */
+.ag-theme-quartz-dark {
+  --ag-background-color: var(--bg-secondary);
+  --ag-foreground-color: var(--text-primary);
+  --ag-header-background-color: var(--card-bg);
+  --ag-header-foreground-color: var(--text-secondary);
+  --ag-border-color: var(--border-color);
+  --ag-row-hover-color: rgba(156, 203, 235, 0.06);
+  --ag-selected-row-background-color: rgba(156, 203, 235, 0.12);
+  --ag-font-family: var(--font-family);
+  --ag-font-size: 13px;
+  --ag-header-column-separator-color: transparent;
+  --ag-odd-row-background-color: var(--bg-primary);
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+}
+
+[data-theme="light"] .ag-theme-quartz-dark {
+  --ag-background-color: #FFFFFF;
+  --ag-foreground-color: #172633;
+  --ag-header-background-color: #EDF3F7;
+  --ag-header-foreground-color: #536B7C;
+  --ag-border-color: #DFE8EF;
+  --ag-row-hover-color: rgba(82, 127, 159, 0.05);
+  --ag-selected-row-background-color: rgba(82, 127, 159, 0.1);
+  --ag-odd-row-background-color: #F4F8FB;
+}
+
+.ag-theme-quartz-dark .ag-header-cell-label {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+}
+
+.ag-theme-quartz-dark .ag-cell {
+  display: flex;
+  align-items: center;
+}
+
+/* Score Progress Bar */
+.score-gauge-bar {
+  width: 100%;
+  height: 6px;
+  background: rgba(120, 139, 157, 0.2);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.score-gauge-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+/* Severity Badges */
+.severity-pill {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.severity-pill.critical {
+  background: var(--status-error-bg);
+  color: var(--status-error);
+  border: 1px solid var(--status-error-border);
+}
+.severity-pill.major {
+  background: var(--status-warning-bg);
+  color: var(--status-warning);
+  border: 1px solid var(--status-warning-border);
+}
+.severity-pill.minor {
+  background: var(--status-info-bg);
+  color: var(--status-info);
+  border: 1px solid var(--status-info-border);
+}
+.severity-pill.security {
+  background: rgba(120, 183, 220, 0.16);
+  color: var(--secondary-accent);
+  border: 1px solid rgba(120, 183, 220, 0.32);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.2s ease forwards;
+}
