@@ -16,7 +16,7 @@ services:
     region: oregon
     branch: main
     rootDir: .
-    buildCommand: npm ci && npm run build --workspace=@openproofpay/shared && npm run build --workspace=@openproofpay/api
+    buildCommand: npm ci --include=dev && npm run build --workspace=@openproofpay/shared && npm run build --workspace=@openproofpay/api
     startCommand: npm run start --workspace=@openproofpay/api
     healthCheckPath: /health
     autoDeploy: true
@@ -85,7 +85,7 @@ services:
     runtime: static
     branch: main
     rootDir: .
-    buildCommand: npm ci && npm run build --workspace=@openproofpay/shared && npm run build --workspace=@openproofpay/web
+    buildCommand: npm ci --include=dev && npm run build --workspace=@openproofpay/shared && npm run build --workspace=@openproofpay/web
     staticPublishPath: ./apps/web/dist
     autoDeploy: true
     envVars:
