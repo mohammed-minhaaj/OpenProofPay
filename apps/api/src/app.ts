@@ -37,10 +37,18 @@ export const createApp = (): Express => {
   );
 
   // 2. Strict CORS policy supporting Web App origin and Chrome Extension origins
+  const configuredOrigins = (env.CLIENT_ORIGIN || '')
+    .split(',')
+    .map((o) => o.trim().replace(/\/$/, ''))
+    .filter(Boolean);
+
   const allowedOrigins: (string | RegExp)[] = [
-    env.CLIENT_ORIGIN,
+    ...configuredOrigins,
+    'http://localhost:3000',
+    'http://localhost:5173',
     env.EXTENSION_ID,
-    /^chrome-extension:\/\/[a-z0-9]{32}$/
+    /^chrome-extension:\/\/[a-z0-9]{32}$/,
+    /^https:\/\/[a-zA-Z0-9_.-]+\.onrender\.com$/
   ];
 
   app.use(
@@ -48,11 +56,12 @@ export const createApp = (): Express => {
       origin: (origin, callback) => {
         if (!origin) return callback(null, true);
 
+        const cleanOrigin = origin.replace(/\/$/, '');
         const isAllowed = allowedOrigins.some((allowed) => {
           if (typeof allowed === 'string') {
-            return allowed === origin;
+            return allowed.toLowerCase() === cleanOrigin.toLowerCase();
           }
-          return allowed.test(origin);
+          return allowed.test(cleanOrigin);
         });
 
         if (isAllowed) {

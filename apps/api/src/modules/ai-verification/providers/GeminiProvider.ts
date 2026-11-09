@@ -44,6 +44,10 @@ export class GeminiProvider implements ILLMProvider {
       new Set([
         this.defaultModel,
         'gemini-3-flash-preview',
+        'gemini-2.5-flash',
+        'gemini-2.0-flash',
+        'gemini-1.5-flash',
+        'gemini-1.5-pro',
         'gemini-3.5-flash',
         'gemini-3.1-flash-lite',
         'gemini-3.1-pro-preview',
@@ -82,9 +86,19 @@ export class GeminiProvider implements ILLMProvider {
           try {
             parsedJson = JSON.parse(rawText);
           } catch {
-            // Fallback cleanup if model returned markdown backticks
-            const cleaned = rawText.replace(/^```json\n?/, '').replace(/\n?```$/, '').trim();
-            parsedJson = JSON.parse(cleaned);
+            // Robust extraction: locate the outermost JSON object or array
+            const jsonMatch = rawText.match(/(\{[\s\S]*\}|\[[\s\S]*\])/);
+            if (jsonMatch) {
+              try {
+                parsedJson = JSON.parse(jsonMatch[0]);
+              } catch {
+                const cleaned = rawText.replace(/```(?:json)?\s*/gi, '').replace(/```\s*$/g, '').trim();
+                parsedJson = JSON.parse(cleaned);
+              }
+            } else {
+              const cleaned = rawText.replace(/```(?:json)?\s*/gi, '').replace(/```\s*$/g, '').trim();
+              parsedJson = JSON.parse(cleaned);
+            }
           }
         }
 

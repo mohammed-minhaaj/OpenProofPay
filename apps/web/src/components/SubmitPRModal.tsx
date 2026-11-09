@@ -14,6 +14,7 @@ export const SubmitPRModal: React.FC<SubmitPRModalProps> = ({
   onSuccess
 }) => {
   const [prUrl, setPrUrl] = useState('');
+  const [githubUsername, setGithubUsername] = useState('');
   const [loading, setLoading] = useState(false);
   const [loadingPRs, setLoadingPRs] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -76,8 +77,10 @@ export const SubmitPRModal: React.FC<SubmitPRModalProps> = ({
     try {
       const taskId = task.id || task._id;
       // 1. Submit PR (manual import of existing PR)
+      const cleanGh = githubUsername.trim().replace(/^@/, '');
       const subRes = await webApi.submitPR(taskId, {
-        prUrl: prUrl.trim()
+        prUrl: prUrl.trim(),
+        githubUsername: cleanGh || undefined
       });
 
       const submissionId =
@@ -250,6 +253,28 @@ export const SubmitPRModal: React.FC<SubmitPRModalProps> = ({
             <span style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px', display: 'block' }}>
               Gemini AI will fetch the exact PR diff, surrounding context, test suite, and evaluate acceptance criteria.
             </span>
+          </div>
+
+          {/* GitHub Username Input */}
+          <div>
+            <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '4px' }}>
+              Your GitHub Username <span style={{ color: 'var(--text-muted)' }}>(Optional if already connected)</span>
+            </label>
+            <input
+              type="text"
+              placeholder="e.g. your-github-handle"
+              value={githubUsername}
+              onChange={(e) => setGithubUsername(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '8px 12px',
+                borderRadius: '6px',
+                border: '1px solid var(--border-color)',
+                backgroundColor: 'var(--input-bg)',
+                color: '#fff',
+                fontSize: '13px'
+              }}
+            />
           </div>
 
           {/* Footer */}

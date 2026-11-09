@@ -8,7 +8,24 @@ import {
   UserRole
 } from '@openproofpay/shared';
 
-export const API_BASE_URL = (import.meta.env.VITE_API_URL as string) || 'http://localhost:5001/api/v1';
+const resolveDefaultApiUrl = (): string => {
+  const envUrl = (import.meta as any).env?.VITE_API_URL as string | undefined;
+  if (envUrl && envUrl.trim() && !envUrl.includes('localhost:5001')) {
+    return envUrl.trim().replace(/\/$/, '');
+  }
+  if (typeof window !== 'undefined' && window.location?.hostname) {
+    const host = window.location.hostname;
+    if (host.includes('-web.onrender.com')) {
+      return `https://${host.replace('-web.onrender.com', '-api.onrender.com')}/api/v1`;
+    }
+    if (host.endsWith('.onrender.com') && host.includes('web')) {
+      return `https://${host.replace('web', 'api')}/api/v1`;
+    }
+  }
+  return (envUrl && envUrl.trim()) || 'http://localhost:5001/api/v1';
+};
+
+export const API_BASE_URL = resolveDefaultApiUrl();
 
 export interface UserSession {
   id: string;
@@ -138,6 +155,21 @@ class WebApiClient {
     }
   }
 
+  async updateProfile(input: { name?: string; githubUsername?: string; paypalReceiverEmail?: string }) {
+    return this.request<{
+      success: true;
+      data: { user: UserSession };
+      message: string;
+    }>('/auth/profile', {
+      method: 'PATCH',
+      body: JSON.stringify(input)
+    });
+  }
+
+  async linkGitHub(githubUsername: string) {
+    return this.updateProfile({ githubUsername });
+  }
+
   // Projects
   async listProjects() {
     return this.request<{
@@ -226,7 +258,7 @@ class WebApiClient {
     });
   }
 
-  async submitPR(taskId: string, input: { prUrl: string; prNumber?: number }) {
+  async submitPR(taskId: string, input: { prUrl: string; prNumber?: number; githubUsername?: string }) {
     return this.request<{
       success: true;
       data: any;

@@ -18,7 +18,8 @@ export const App: React.FC = () => {
   const [authEmail, setAuthEmail] = useState('');
   const [authPassword, setAuthPassword] = useState('');
   const [authName, setAuthName] = useState('');
-  const [authRole, setAuthRole] = useState<UserRole>(UserRole.EMPLOYER);
+  const [authRole, setAuthRole] = useState<UserRole>(UserRole.DEVELOPER);
+  const [authGithubUsername, setAuthGithubUsername] = useState('');
   const [authError, setAuthError] = useState<string | null>(null);
 
   // App Navigation & Theme State
@@ -118,7 +119,8 @@ export const App: React.FC = () => {
           name: authName.trim(),
           email: authEmail.trim(),
           password: authPassword,
-          role: authRole
+          role: authRole,
+          githubUsername: authGithubUsername.trim() || undefined
         });
         setUser(res.user);
       }
@@ -284,6 +286,30 @@ export const App: React.FC = () => {
               </div>
             )}
 
+            {!isLogin && (
+              <div>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '6px' }}>
+                  GitHub Username <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: 400 }}>(Connects your PRs for AI Verification)</span>
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. your-github-handle"
+                  value={authGithubUsername}
+                  onChange={(e) => setAuthGithubUsername(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    borderRadius: '8px',
+                    backgroundColor: 'var(--input-bg)',
+                    border: '1px solid var(--border-color)',
+                    color: 'var(--text-primary)',
+                    fontSize: '14px',
+                    outline: 'none'
+                  }}
+                />
+              </div>
+            )}
+
             <div>
               <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '6px' }}>
                 Email
@@ -410,6 +436,7 @@ export const App: React.FC = () => {
         onNavigate={(screen) => handleNavigate(screen)}
         onToggleTheme={toggleTheme}
         onLogout={handleLogout}
+        onUpdateUser={(updated) => setUser(updated)}
       />
 
       {/* Main Screen Content (Strictly the 5 screens) */}
@@ -439,6 +466,7 @@ export const App: React.FC = () => {
             user={user}
             onNavigate={handleNavigate}
             onRefreshData={loadDashboardData}
+            onUpdateUser={(updated) => setUser(updated)}
           />
         )}
 

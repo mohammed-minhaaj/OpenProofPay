@@ -143,7 +143,8 @@ export class PaymentsService {
     }
 
     let authId = `AUTH-${orderId}`;
-    if (simulateInDev && env.NODE_ENV === 'development') {
+    const isSandboxOrDev = env.NODE_ENV === 'development' || env.PAYPAL_MODE === 'sandbox';
+    if (simulateInDev && isSandboxOrDev) {
       authId = `AUTH-SANDBOX-${Date.now()}`;
     } else {
       try {
@@ -154,7 +155,8 @@ export class PaymentsService {
           orderRes.purchase_units?.[0]?.payments?.authorizations?.[0]?.id ||
           `AUTH-${orderId}`;
       } catch (err: any) {
-        if (simulateInDev && env.NODE_ENV === 'development') {
+        const isSandboxOrDev = env.NODE_ENV === 'development' || env.PAYPAL_MODE === 'sandbox';
+        if (simulateInDev && isSandboxOrDev) {
           authId = `AUTH-SANDBOX-${Date.now()}`;
         } else {
           throw err;

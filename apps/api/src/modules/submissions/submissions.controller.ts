@@ -7,7 +7,8 @@ import { z } from 'zod';
 
 const SubmitPrBodySchema = z.object({
   prUrl: z.string().url(),
-  prNumber: z.number().int().positive().optional()
+  prNumber: z.number().int().positive().optional(),
+  githubUsername: z.string().trim().optional()
 });
 
 export class SubmissionsController {
@@ -24,7 +25,8 @@ export class SubmissionsController {
           taskId,
           developerId: req.user.userId,
           prUrl: validated.prUrl,
-          prNumber: validated.prNumber
+          prNumber: validated.prNumber,
+          githubUsername: validated.githubUsername
         },
         req.ip
       );

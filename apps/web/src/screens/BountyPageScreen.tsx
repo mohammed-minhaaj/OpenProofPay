@@ -21,6 +21,7 @@ interface BountyPageScreenProps {
   initialTask?: any;
   onNavigate: (screen: string, taskId?: string) => void;
   onRefreshData: () => void;
+  onUpdateUser?: (user: UserSession) => void;
 }
 
 export const BountyPageScreen: React.FC<BountyPageScreenProps> = ({
@@ -28,7 +29,8 @@ export const BountyPageScreen: React.FC<BountyPageScreenProps> = ({
   user,
   initialTask,
   onNavigate,
-  onRefreshData
+  onRefreshData,
+  onUpdateUser
 }) => {
   const isAdmin = user.role === 'EMPLOYER' || user.role === 'ADMIN';
   const [task, setTask] = useState<any | null>(initialTask || null);
@@ -40,6 +42,7 @@ export const BountyPageScreen: React.FC<BountyPageScreenProps> = ({
 
   // PR Submission state
   const [prUrl, setPrUrl] = useState('');
+  const [prGithubUsername, setPrGithubUsername] = useState(user.githubUsername || '');
   const [showPrInput, setShowPrInput] = useState(false);
   const [availablePrs, setAvailablePrs] = useState<any[]>([]);
   const [loadingPrs, setLoadingPrs] = useState(false);
@@ -150,11 +153,33 @@ export const BountyPageScreen: React.FC<BountyPageScreenProps> = ({
       setError('Please provide or select a valid GitHub Pull Request URL.');
       return;
     }
+    const cleanGh = prGithubUsername.trim().replace(/^@/, '') || user.githubUsername;
+    if (!user.githubConnected && !cleanGh) {
+      setError('Please provide your GitHub username to link with this pull request.');
+      return;
+    }
+
     setActionLoading(true);
     setError(null);
     setSuccessMsg(null);
     try {
-      await webApi.submitPR(taskId, { prUrl: prUrl.trim() });
+      await webApi.submitPR(taskId, {
+        prUrl: prUrl.trim(),
+        githubUsername: cleanGh || undefined
+      });
+
+      // Update user state if new GitHub username was provided
+      if (cleanGh && (!user.githubConnected || user.githubUsername !== cleanGh)) {
+        try {
+          const profileRes = await webApi.linkGitHub(cleanGh);
+          if (onUpdateUser && profileRes.data?.user) {
+            onUpdateUser(profileRes.data.user);
+          }
+        } catch {
+          // Non-blocking if profile sync already succeeded via submitPR
+        }
+      }
+
       setSuccessMsg('Pull request submitted! AI Verification pipeline is running.');
       setShowPrInput(false);
       await fetchTask();
@@ -767,6 +792,9 @@ export const BountyPageScreen: React.FC<BountyPageScreenProps> = ({
 
                       {showPrInput ? (
                         <div>
+                          <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                            GitHub Pull Request URL
+                          </label>
                           <input
                             type="url"
                             placeholder="https://github.com/.../pull/12"
@@ -784,6 +812,35 @@ export const BountyPageScreen: React.FC<BountyPageScreenProps> = ({
                               outline: 'none'
                             }}
                           />
+
+                          {!user?.githubConnected && (
+                            <div style={{ marginBottom: '12px' }}>
+                              <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                                Your GitHub Username <span style={{ color: 'var(--text-muted)' }}>(Verifies PR authorship for AI check)</span>
+                              </label>
+                              <div style={{ position: 'relative' }}>
+                                <span style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', fontSize: '12px', fontWeight: 500 }}>
+                                  @
+                                </span>
+                                <input
+                                  type="text"
+                                  placeholder="e.g. your-github-handle"
+                                  value={prGithubUsername}
+                                  onChange={(e) => setPrGithubUsername(e.target.value)}
+                                  style={{
+                                    width: '100%',
+                                    padding: '8px 10px 8px 24px',
+                                    borderRadius: '6px',
+                                    backgroundColor: 'var(--input-bg)',
+                                    border: '1px solid var(--border-color)',
+                                    color: 'var(--text-primary)',
+                                    fontSize: '13px',
+                                    outline: 'none'
+                                  }}
+                                />
+                              </div>
+                            </div>
+                          )}
                           <div style={{ display: 'flex', gap: '8px' }}>
                             <button
                               onClick={() => setShowPrInput(false)}

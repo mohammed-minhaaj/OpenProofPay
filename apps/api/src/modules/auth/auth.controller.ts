@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { RegisterUserSchema, LoginUserSchema, UserRole } from '@openproofpay/shared';
+import { RegisterUserSchema, LoginUserSchema, UpdateProfileSchema, UserRole } from '@openproofpay/shared';
 import { AuthService } from './auth.service.js';
 import { AppError } from '../../errors/AppError.js';
 import { env } from '../../config/env.js';
@@ -7,7 +7,7 @@ import { env } from '../../config/env.js';
 const COOKIE_OPTIONS = {
   httpOnly: true,
   secure: env.NODE_ENV === 'production',
-  sameSite: 'lax' as const,
+  sameSite: env.NODE_ENV === 'production' ? ('none' as const) : ('lax' as const),
   maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
 };
 
@@ -120,6 +120,21 @@ export class AuthController {
             canApprovePayments: req.user.role === 'EMPLOYER' || req.user.role === 'ADMIN'
           }
         }
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  static async updateProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      if (!req.user) throw AppError.unauthorized();
+      const validated = UpdateProfileSchema.parse(req.body);
+      const user = await AuthService.updateProfile(req.user.userId, validated);
+      res.status(200).json({
+        success: true,
+        data: { user },
+        message: 'Profile updated successfully'
       });
     } catch (err) {
       next(err);

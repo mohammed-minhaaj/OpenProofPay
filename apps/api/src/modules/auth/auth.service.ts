@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
-import { RegisterUserInput, LoginUserInput, UserRole } from '@openproofpay/shared';
+import { RegisterUserInput, LoginUserInput, UpdateProfileInput, UserRole } from '@openproofpay/shared';
 import { UserModel, IUserDocument } from '../../models/User.js';
 import { AuditLogModel } from '../../models/AuditLog.js';
 import { AppError } from '../../errors/AppError.js';
@@ -181,6 +181,48 @@ export class AuthService {
     if (!user) {
       throw AppError.notFound('User not found');
     }
+    return this.formatUser(user);
+  }
+
+  /**
+   * Update user profile (e.g. GitHub handle, name, PayPal details)
+   */
+  static async updateProfile(userId: string, input: UpdateProfileInput): Promise<AuthResult['user']> {
+    const user = await UserModel.findById(userId);
+    if (!user) {
+      throw AppError.notFound('User not found');
+    }
+
+    if (input.name) {
+      user.name = input.name.trim();
+    }
+
+    if (input.githubUsername !== undefined) {
+      const cleanUsername = input.githubUsername.trim().replace(/^@/, '');
+      if (cleanUsername) {
+        if (cleanUsername !== user.githubUsername) {
+          const existingGh = await UserModel.findOne({ githubUsername: cleanUsername, _id: { $ne: user._id } });
+          if (existingGh) {
+            throw AppError.conflict('GitHub username is already linked to another account');
+          }
+        }
+        user.githubUsername = cleanUsername;
+        user.githubConnected = true;
+      } else {
+        user.githubUsername = undefined;
+        user.githubConnected = false;
+      }
+    }
+
+    if (input.paypalReceiverEmail !== undefined) {
+      user.paypalEmail = input.paypalReceiverEmail.trim() || undefined;
+    }
+
+    if (input.paypalMerchantId !== undefined) {
+      user.paypalMerchantId = input.paypalMerchantId.trim() || undefined;
+    }
+
+    await user.save();
     return this.formatUser(user);
   }
 

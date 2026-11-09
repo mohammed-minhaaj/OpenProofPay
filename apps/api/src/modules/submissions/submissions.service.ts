@@ -14,6 +14,7 @@ export interface SubmitPRInput {
   developerId: string;
   prUrl: string;
   prNumber?: number;
+  githubUsername?: string;
 }
 
 export class SubmissionsService {
@@ -21,12 +22,22 @@ export class SubmissionsService {
    * Submit untrusted PR for rigorous validation and verification pipeline
    */
   static async submitPR(input: SubmitPRInput, ipAddress?: string): Promise<IPullRequestSubmissionDocument> {
-    const { taskId, developerId, prUrl, prNumber: inputPrNum } = input;
+    const { taskId, developerId, prUrl, prNumber: inputPrNum, githubUsername } = input;
 
     // 1. Verify Developer Account & GitHub Link
     const developer = await UserModel.findById(developerId);
     if (!developer) {
       throw AppError.notFound('Developer not found');
+    }
+
+    // Auto-link GitHub username if supplied with submission
+    if (githubUsername && (!developer.githubConnected || !developer.githubUsername)) {
+      const cleanGh = githubUsername.trim().replace(/^@/, '');
+      if (cleanGh) {
+        developer.githubConnected = true;
+        developer.githubUsername = cleanGh;
+        await developer.save();
+      }
     }
 
     const isDev = process.env.NODE_ENV === 'development';
