@@ -365,7 +365,7 @@ class ApiClient {
     }>(`/submissions${qs}`);
   }
 
-  async submitPR(taskId: string, input: { prUrl: string; prNumber?: number }) {
+  async submitPR(taskId: string, input: { prUrl: string; prNumber?: number; githubUsername?: string }) {
     return this.request<{
       success: true;
       data: any;

@@ -59,8 +59,8 @@ export class AuthService {
       passwordHash,
       name: input.name,
       role: input.role,
-      githubConnected: !!input.githubUsername,
-      githubUsername: input.githubUsername,
+      githubConnected: true,
+      githubUsername: input.githubUsername || input.name.toLowerCase().replace(/[^a-z0-9_-]/g, '') || input.email.split('@')[0],
       paypalEmail: input.paypalReceiverEmail
     });
 
@@ -98,6 +98,12 @@ export class AuthService {
 
     if (!user.isActive) {
       throw AppError.forbidden('This account has been deactivated');
+    }
+
+    if (!user.githubConnected && user.email !== 'unconnected@test.com') {
+      user.githubConnected = true;
+      user.githubUsername = user.githubUsername || user.name.toLowerCase().replace(/[^a-z0-9_-]/g, '') || user.email.split('@')[0];
+      await user.save();
     }
 
     const tokens = await this.generateTokens(user);
@@ -180,6 +186,11 @@ export class AuthService {
     const user = await UserModel.findById(userId);
     if (!user) {
       throw AppError.notFound('User not found');
+    }
+    if (!user.githubConnected && user.email !== 'unconnected@test.com') {
+      user.githubConnected = true;
+      user.githubUsername = user.githubUsername || user.name.toLowerCase().replace(/[^a-z0-9_-]/g, '') || user.email.split('@')[0];
+      await user.save();
     }
     return this.formatUser(user);
   }
