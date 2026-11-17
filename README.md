@@ -163,6 +163,9 @@ openproofpay/
 - PayPal Developer Account (for Sandbox credentials)
 - Gemini API Key
 
+SAMPLE GITHUB REPO TO USE: https://github.com/piyushgarg-dev/piyushgargdev-nextjs
+TRY ON RENDER DIRECTLY BY CREATING NEW ACCOUNT: https://openproofpay-web.onrender.com/ 
+
 ### 1. Installation
 ```bash
 # Clone the repository
