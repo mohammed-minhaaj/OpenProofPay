@@ -11,6 +11,9 @@
 [![PayPal](https://img.shields.io/badge/PayPal-Auth_Capture_Payout-003087.svg)](https://developer.paypal.com/)
 [![Tests](https://img.shields.io/badge/Tests-All_Passing-brightgreen.svg)](https://vitest.dev/)
 [![Docker](https://img.shields.io/badge/Docker-Ephemeral_Sandbox-2496ED.svg)](https://www.docker.com/)
+[![AG Grid](https://img.shields.io/badge/AG_Grid-Data_Grids-0084D1.svg)](https://www.ag-grid.com/)
+[![APIMatic](https://img.shields.io/badge/APIMatic-API_Contract_Validation-6C2DC7.svg)](https://www.apimatic.io/)
+[![Render](https://img.shields.io/badge/Render-Cloud_Deployment-46E3B7.svg)](https://render.com/)
 
 **Trustless GitHub contribution verification powered by Gemini AI, isolated container testing, and three-stage PayPal payments.**
 
@@ -229,6 +232,65 @@ Visit `http://localhost:3000` to open the OpenProofPay dashboard.
   5. **Awaiting Review**: Unified review hub with criterion-by-criterion evidence, security findings, and honest test logs.
   6. **Approved**: Human employer approval gate.
   7. **Paid Out**: PayPal escrow capture and separate developer payout settlement.
+
+---
+
+## Sponsor Technology Integrations
+
+OpenProofPay leverages best-in-class sponsor technologies where they deliver genuine, measurable value to the platform:
+
+### 🟦 AG Grid — High-Performance Data Grids for Financial & Verification Data
+
+**Package**: `ag-grid-community` + `ag-grid-react` v36.3.0
+
+AG Grid powers all tabular data surfaces across the OpenProofPay web dashboard, providing enterprise-grade data visualization for financial and verification workflows:
+
+| Grid Component | Purpose |
+|---|---|
+| **PaymentLedgerGrid** | Searchable, filterable payment ledger with append-only audit trail and CSV export — critical for financial transparency and dispute resolution |
+| **VerificationFindingsGrid** | Structured display of AI verification results, security findings, and criterion-level evidence with inline expandability |
+| **TaskManagementGrid** | Bounty task lifecycle tracking with status filtering, assignee columns, and real-time state progression |
+
+**Why AG Grid is the best fit here:**
+- **Financial-grade performance** — AG Grid handles thousands of payment records with virtualized row rendering, zero DOM bloat, and sub-frame scroll performance. For a bounty platform where payment audit trails grow continuously, this is non-negotiable.
+- **Built-in CSV/Excel export** — Employers and developers can export payment history and verification reports without any custom export logic, satisfying compliance and record-keeping needs out of the box.
+- **Column-level filtering and sorting** — Every grid column supports instant type-ahead filtering, multi-column sorting, and column reordering, letting administrators drill into specific transactions, date ranges, or verification statuses without writing custom filter UIs.
+- **Theming** — AG Grid's Quartz theme integrates cleanly with OpenProofPay's light/dark mode system using pure CSS variable overrides.
+
+### 🟪 APIMatic — API Contract Validation & Specification Hardening
+
+**Role**: Design-time and development-time API contract verification tool
+
+APIMatic's Developer Platform was used as the authoritative specification engine to validate, normalize, and harden all PayPal REST API integrations before a single line of production code was written:
+
+- **Specification Ingestion** — PayPal's four disparate API surfaces (Orders v2, Payments v2, Payouts v1, Webhooks v1) were imported into APIMatic to generate a single, unified OpenAPI 3.0 specification.
+- **Schema Hardening** — APIMatic identified critical contract pitfalls: ISO-4217 decimal precision rules, `PayPal-Request-Id` length constraints (≤36 chars), snake_case webhook header mapping, and RFC-7807 error response structures.
+- **Contract Test Generation** — The hardened specifications directly informed 12 dedicated PayPal contract validation tests (`paypal-contract.test.ts`), all passing at 100% conformance.
+
+**Why APIMatic is the best fit here:**
+- **Prevents silent API failures** — PayPal's sandbox returns cryptic 400/422 errors for precision mismatches (e.g., sending `100` instead of `"100.00"` for USD). APIMatic catches these at design time, before they become production incidents.
+- **Multi-API unification** — Rather than manually cross-referencing four separate PayPal API doc sets, APIMatic produces one normalized spec, eliminating inconsistencies between endpoint naming conventions, authentication flows, and error formats.
+- **Decoupled from runtime** — APIMatic is strictly a development-time tool. It validates contracts and generates type-safe interfaces without introducing any runtime dependency, middleware layer, or SDK wrapper — keeping the production PayPal integration lean and direct.
+
+> 📖 Full integration details: [APIMatic Integration Guide](docs/APIMATIC_INTEGRATION.md)
+
+### 🟩 Render — Zero-Config Cloud Deployment Platform
+
+**Config**: [`render.yaml`](render.yaml) — Infrastructure-as-Code blueprint
+
+Render hosts the complete OpenProofPay production stack with a single declarative YAML file:
+
+| Service | Type | Details |
+|---|---|---|
+| **openproofpay-api** | Node.js Web Service | Express API with health checks, auto-deploy from `main`, and auto-generated JWT secrets |
+| **openproofpay-web** | Static Site | Vite React SPA with HTML5 pushState rewrites for client-side routing |
+
+**Why Render is the best fit here:**
+- **True Infrastructure-as-Code** — The entire deployment topology lives in a single `render.yaml` committed to the repo. Any contributor can understand, review, and reproduce the full infrastructure by reading one file — no clicking through cloud consoles.
+- **Monorepo-native builds** — Render supports npm workspace build commands natively (`npm run build --workspace=@openproofpay/api`), eliminating the need for custom build scripts or multi-stage Dockerfiles just to deploy a monorepo.
+- **Auto-deploy on push** — Every merge to `main` triggers an automatic build and deploy for both the API and web dashboard, with zero CI/CD pipeline configuration required.
+- **Static site SPA support** — Render's built-in rewrite rules (`/* → /index.html`) handle React Router's client-side routing without needing a custom server, Nginx config, or CDN rules.
+- **Free tier alignment** — For an open-source hackathon project, Render's free plan provides production-grade HTTPS, health checks, and environment variable management without upfront cost.
 
 ---
 
